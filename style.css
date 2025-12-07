@@ -636,8 +636,9 @@ input[type="text"]:focus {
 }
 
 /* Reorder indicator */
+/* Reorder indicator - Removed per user request */
 .task-item.drag-over {
-    border: 2px dashed var(--accent);
+    /* border: 2px dashed var(--accent); */
 }
 
 /* Nesting indicator */
