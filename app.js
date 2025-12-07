@@ -62,15 +62,68 @@ const taskHeader = document.querySelector('.task-header');
             return;
         }
 
-        // List Drop -> Bottom of List
+        // List Drop -> Calculate Gap Position
         if (e.target === taskList || e.target.classList.contains('empty-state')) {
+            const afterElement = getDragAfterElement(taskList, e.clientY);
+            let targetIndex;
+
+            if (afterElement == null) {
+                targetIndex = tasks.length; // End of list
+            } else {
+                const afterIndex = parseInt(afterElement.dataset.index);
+                // If moving main task, adjust index based on current position
+                if (dragType === 'main' && dragStartIndex < afterIndex) {
+                    targetIndex = afterIndex - 1;
+                } else {
+                    targetIndex = afterIndex;
+                }
+            }
+
+            // Correction because splicing first changes the array
+            // Actually, for simplicity: Remove first, then insert.
+
             if (dragType === 'main') {
                 const item = tasks.splice(dragStartIndex, 1)[0];
-                tasks.push(item); // Move to Bottom
+                // If we removed from before the target, the target index shifted down by 1 in the *new* array?
+                // Wait.
+                // Case: [0, 1, 2, 3]. Move 0 to before 3.
+                // afterElement is 3. afterIndex is 3.
+                // remove 0. [1, 2, 3].
+                // We want to insert before 3. 3 is now at index 2.
+                // So target should be 2.
+                // My logic: if (0 < 3) target = 3 - 1 = 2. Correct.
+
+                // Case: [0, 1, 2, 3]. Move 3 to before 0.
+                // afterElement is 0. afterIndex is 0.
+                // remove 3. [0, 1, 2].
+                // We want to insert at 0.
+                // logic: if (3 < 0) false. target = 0. Correct.
+
+                // What if targetIndex is tasks.length?
+                // Move 0 to end (null).
+                // remove 0. push to end. Correct.
+
+                // Boundary: Move 0 to before 1?
+                // afterElement is 1. index 1.
+                // target = 1 - 1 = 0.
+                // remove 0. insert at 0. Noop. Correct.
+
+                if (afterElement == null) {
+                    tasks.push(item);
+                } else {
+                    tasks.splice(targetIndex, 0, item);
+                }
+
                 saveTasks();
                 renderTasks();
             } else if (dragType === 'sub') {
-                convertSubtaskToMain(dragStartIndex, dragSubIndex, tasks.length); // Un-nest to Bottom
+                // For subtasks converting to main, the 'dragStartIndex' is relative to parent sublist
+                // taking it out doesn't affect main list indices yet.
+                // So we just insert at 'afterIndex' (or length if null).
+                // But wait, 'afterIndex' is based on the Main List.
+
+                const insertionIndex = afterElement == null ? tasks.length : parseInt(afterElement.dataset.index);
+                convertSubtaskToMain(dragStartIndex, dragSubIndex, insertionIndex);
             }
         }
     });
@@ -737,3 +790,22 @@ timerToggle.onclick = () => {
 
 // Init
 renderTasks();
+
+// Helper to determine drop position in list gaps
+function getDragAfterElement(container, y) {
+    const draggableElements = [...container.querySelectorAll('.task-item:not(.dragging)')];
+
+    return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        // Check offset from the center of the box
+        const offset = y - box.top - box.height / 2;
+
+        // We want the element where the cursor is *above* the center (negative offset)
+        // and closest to 0 (least negative)
+        if (offset < 0 && offset > closest.offset) {
+            return { offset: offset, element: child };
+        } else {
+            return closest;
+        }
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
