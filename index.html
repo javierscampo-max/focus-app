@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Focus App</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="apple-touch-icon" href="icon.png">
+</head>
+
+<body>
+    <div id="app">
+        <!-- View: Tasks -->
+        <div id="view-tasks" class="view active">
+            <header class="task-header">
+                <div>
+                    <h1>My Tasks</h1>
+                    <p class="subtitle">Let's get things done.</p>
+                </div>
+                <div id="task-count">0 left</div>
+            </header>
+            <div id="task-list">
+                <!-- Tasks will be injected here by JS -->
+                <div class="empty-state">
+                    <p>No tasks yet. Tap + to add one.</p>
+                </div>
+            </div>
+            <button id="add-task-btn" class="fab">+</button>
+        </div>
+
+        <!-- View: Calendar -->
+        <div id="view-calendar" class="view">
+            <header class="calendar-header">
+                <button id="prev-month-btn" class="icon-btn">‹</button>
+                <h1 id="current-month-display"></h1>
+                <button id="next-month-btn" class="icon-btn">›</button>
+            </header>
+            <div id="calendar-grid">
+                <!-- Calendar days injected by JS -->
+            </div>
+        </div>
+
+        <!-- View: Focus -->
+        <div id="view-focus" class="view">
+            <header>
+                <h1>Focus Mode</h1>
+            </header>
+            <div class="timer-container">
+                <div class="timer-circle">
+                    <svg viewBox="0 0 100 100">
+                        <circle class="bg-ring" cx="50" cy="50" r="45"></circle>
+                        <circle class="progress-ring" cx="50" cy="50" r="45"></circle>
+                    </svg>
+                    <div id="timer-display">25:00</div>
+                </div>
+
+                <div class="timer-controls">
+                    <label>Duration: <span id="duration-value">25</span> min</label>
+                    <input type="range" id="duration-slider" min="1" max="120" value="25">
+                </div>
+
+                <button id="timer-toggle" class="primary-btn">Start Focus</button>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav id="bottom-nav">
+            <button class="nav-item active" data-target="view-tasks">
+                <span class="icon">📝</span>
+                <span class="label">Tasks</span>
+            </button>
+            <button class="nav-item" data-target="view-calendar">
+                <span class="icon">📅</span>
+                <span class="label">Calendar</span>
+            </button>
+            <button class="nav-item" data-target="view-focus">
+                <span class="icon">🎯</span>
+                <span class="label">Focus</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Modals -->
+    <div id="task-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>New Task</h2>
+            <input type="text" id="new-task-input" placeholder="What needs to be done?">
+            <div class="modal-actions">
+                <button id="cancel-task-btn">Cancel</button>
+                <button id="save-task-btn" class="primary-btn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Day View Modal (Full Screen) -->
+    <div id="day-view-modal" class="modal full-screen hidden">
+        <div class="modal-content full-screen-content">
+            <header class="modal-header">
+                <button id="close-day-view-btn" class="icon-btn">←</button>
+                <h2 id="day-view-date">Date</h2>
+                <button id="add-event-btn" class="icon-btn">+</button>
+            </header>
+            <div id="day-timeline">
+                <!-- Hours injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <div id="event-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>New Event</h2>
+            <input type="text" id="new-event-title" placeholder="Event Title (e.g. Lunch)">
+            <div class="time-inputs">
+                <input type="time" id="new-event-start" step="300">
+                <span>to</span>
+                <input type="time" id="new-event-end" step="300">
+            </div>
+            <div class="modal-actions">
+                <button id="cancel-event-btn">Cancel</button>
+                <button id="save-event-btn" class="primary-btn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

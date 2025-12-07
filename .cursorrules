@@ -1,0 +1,77 @@
+# Project Context: Productivity PWA
+
+## Overview
+This is a mobile-first Progressive Web App (PWA) designed for personal productivity. It combines three main features:
+1.  **Task Manager**: A simple to-do list.
+2.  **Calendar**: A monthly view with a detailed daily hourly timeline.
+3.  **Focus Timer**: A customizable countdown timer for focus sessions.
+
+## Tech Stack
+-   **Core**: Vanilla HTML5, CSS3, JavaScript (ES6+).
+-   **No Frameworks**: Pure DOM manipulation and `localStorage` for state.
+-   **Deployment**: Static hosting (e.g., Netlify Drop).
+-   **Styling**: Custom CSS with a "Midnight Mode" theme (Dark background `#0f172a`, Neon Blue accent `#38bdf8`).
+
+## Key Features & Rules
+
+### 1. Task Management
+-   **Persistence**: All tasks are saved to `localStorage` under the key `tasks`.
+-   **Visuals**:
+    -   Completed tasks must have a strikethrough and dimmed opacity.
+    -   **Delayed Sorting**: When a task is checked, it must wait **600ms** (0.6s) before moving to the bottom of the list. This allows the user to see the check animation.
+    -   **Counter**: A "Task Counter" in the header must show the number of remaining (incomplete) tasks.
+    -   **Sorting & Subtasks**:
+        -   **Manual Sorting**: Tasks are manually reorderable via Drag-and-Drop. Auto-sorting is disabled.
+        -   **Checked Area**: Checked tasks MUST adhere to the bottom. Unchecked tasks cannot be dragged below a checked task.
+        -   **Subtasks**: 
+            -   Single-level nesting only.
+            -   **Sorting**: Completed subtasks move to the bottom of the sublist (600ms delay).
+            -   **Un-nesting**: Dragging a subtask to the main list converts it to a Main Task.
+            -   **Folding**: Subtasks can be collapsed/expanded via a chevron toggle. State is persisted.
+        -   **Drag Actions**: "Drag Over" top/bottom 10% = Reorder. Middle 80% = Nest as Subtask.
+        -   **Large Drop Zone**: The empty space below the task list is an active drop zone. Dropping here moves the task to the bottom.
+        -   **Drop to Top**: Dropping a task on the "My Tasks" header moves it to the top of the list.
+        -   **Scrolling**: 
+            -   **Layout**: Header is fixed; Task List scrolls independently.
+            -   **Auto-Scroll**: List auto-scrolls when dragging near top/bottom edges.
+        -   **Nesting Constraint**: A task with existing subtasks CANNOT be nested into another task (max depth 1).
+        -   **Text Wrapping**: Long task names must wrap to new lines.
+
+### 2. Calendar & Events
+-   **Views**:
+    -   **Month View**: Standard grid. Current day highlighted.
+    -   **Day View**: A full-screen modal showing an hourly timeline (00:00 - 23:00).
+-   **Event Logic**:
+    -   **Storage**: Saved to `localStorage` under `events` (Key: `YYYY-MM-DD`).
+    -   **Positioning**: Events on the timeline are positioned absolutely.
+        -   **Rule**: `1 minute = 1px` height.
+        -   **Offset**: Add `16px` to the `top` position to account for container padding/margins so events align with time slots.
+    -   **Multi-day**: Events that cross midnight (e.g., 10 PM - 2 AM) must be split into two segments automatically.
+    -   **Time Picker**: Inputs for start/end time must use `step="300"` to enforce 5-minute increments.
+
+### 3. Focus Timer
+-   **UI**: A circular SVG progress ring.
+    -   **Fix**: Ensure the SVG circle `fill` is set to `transparent` or `none` to avoid visual glitches ("black spot").
+-   **Controls**:
+    -   Slider to adjust duration (1 - 120 minutes).
+    -   Start/Stop toggle button.
+-   **State**: Timer state is local to the current session (resets on reload).
+
+### 4. Design System
+-   **Theme**: Dark mode default.
+-   **Navigation**: Fixed bottom navigation bar with 3 tabs.
+-   **Animations**: Smooth transitions for view switching (`fadeIn`) and task sorting.
+-   **Mobile-First**: All tap targets (buttons, inputs) must be at least 44px sized/spaced for touch.
+-   **Scrollbars**: Custom thin, rounded, dark scrollbars for a premium feel on non-mobile devices (or where visible).
+
+## File Structure
+-   `index.html`: Main entry point, contains all views and modals.
+-   `style.css`: All styling.
+-   `app.js`: Application logic, event listeners, and state management.
+-   `manifest.json`: PWA configuration.
+
+## Deployment Instructions
+To deploy:
+1.  Drag the project folder to [Netlify Drop](https://app.netlify.com/drop).
+2.  Open the provided URL on a mobile device.
+3.  Select "Add to Home Screen" to install as a PWA.
