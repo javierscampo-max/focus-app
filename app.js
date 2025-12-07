@@ -35,7 +35,23 @@ const taskHeader = document.querySelector('.task-header');
 [taskHeader, taskList].forEach(container => {
     container.addEventListener('dragover', (e) => {
         e.preventDefault();
-        // Visuals removed
+
+        // Auto-Scroll Check (Active on Container too)
+        const scrollContainer = taskList.parentElement;
+        const listRect = scrollContainer.getBoundingClientRect();
+        const scrollThreshold = 80;
+
+        if (e.clientY < listRect.top + scrollThreshold) {
+            scrollSpeed = -15;
+            startAutoScroll();
+            // console.log('Container Scroll Up');
+        } else if (e.clientY > listRect.bottom - scrollThreshold) {
+            scrollSpeed = 15;
+            startAutoScroll();
+            // console.log('Container Scroll Down');
+        } else {
+            stopAutoScroll();
+        }
     });
 
     container.addEventListener('dragleave', (e) => {
@@ -246,11 +262,20 @@ function stopAutoScroll() {
 
 function startAutoScroll() {
     if (scrollInterval) return;
+    const scrollContainer = taskList.parentElement; // The .view container
     scrollInterval = setInterval(() => {
         if (scrollSpeed !== 0) {
-            taskList.scrollTop += scrollSpeed;
+            scrollContainer.scrollTop += scrollSpeed;
         }
     }, 16); // ~60fps
+}
+
+function stopAutoScroll() {
+    if (scrollInterval) {
+        clearInterval(scrollInterval);
+        scrollInterval = null;
+        scrollSpeed = 0;
+    }
 }
 
 // Drag & Drop Functions
@@ -292,8 +317,10 @@ function dragOver(e) {
     e.preventDefault();
 
     // Auto-Scroll Check
-    const listRect = taskList.getBoundingClientRect();
+    const scrollContainer = taskList.parentElement;
+    const listRect = scrollContainer.getBoundingClientRect();
     const scrollThreshold = 80;
+
     if (e.clientY < listRect.top + scrollThreshold) {
         scrollSpeed = -15;
         startAutoScroll();
@@ -329,11 +356,6 @@ function dragOver(e) {
             item.classList.add('drag-over');
         }
     } else if (dragType === 'sub') {
-        // If hovering over a subtask, let's just highlight the parent container's drag-over for now
-        // to simplify visual cues. Or relies on drop logic.
-        // If we drop on the main task -> Un-nest or Nest depending on zone.
-
-        // Check nesting zone on parent
         const isNesting = (offset > height * 0.1 && offset < height * 0.9);
         if (isNesting) {
             item.classList.add('nest-target');
