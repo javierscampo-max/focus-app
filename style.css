@@ -304,6 +304,17 @@ header h1 {
 }
 
 /* Calendar */
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-bottom: 8px;
+    text-align: center;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
 #calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -637,9 +648,6 @@ input[type="text"]:focus {
 
 /* Reorder indicator */
 /* Reorder indicator - Removed per user request */
-.task-item.drag-over {
-    /* border: 2px dashed var(--accent); */
-}
 
 /* Nesting indicator */
 .task-item.nest-target {

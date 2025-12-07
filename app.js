@@ -688,18 +688,41 @@ function renderTimeline() {
 
 // Event Modal
 const eventModal = document.getElementById('event-modal');
+const dateInput = document.getElementById('new-event-date');
+
 document.getElementById('add-event-btn').onclick = () => {
+    // Open from Day View: specific date selected (Lock it)
+    dateInput.value = selectedDateKey;
+    dateInput.disabled = true; // Lock date
+
     eventModal.classList.remove('hidden');
     document.getElementById('new-event-title').focus();
 };
+
+document.getElementById('global-add-event-btn').onclick = () => {
+    // Default to today if no date selected
+    if (!selectedDateKey) {
+        const today = new Date();
+        selectedDateKey = today.toISOString().split('T')[0];
+    }
+    dateInput.value = selectedDateKey;
+    dateInput.disabled = false; // Allow changes
+
+    eventModal.classList.remove('hidden');
+    document.getElementById('new-event-title').focus();
+};
+
 document.getElementById('cancel-event-btn').onclick = () => eventModal.classList.add('hidden');
 
 document.getElementById('save-event-btn').onclick = () => {
     const title = document.getElementById('new-event-title').value.trim();
     const start = document.getElementById('new-event-start').value;
     const end = document.getElementById('new-event-end').value;
+    const date = dateInput.value; // Read selected date
 
-    if (title && start && end) {
+    if (title && start && end && date) {
+        selectedDateKey = date; // Update key to usage
+
         if (!events[selectedDateKey]) events[selectedDateKey] = [];
 
         // Handle overnight events (simple split)

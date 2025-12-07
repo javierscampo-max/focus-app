@@ -40,9 +40,19 @@
                 <h1 id="current-month-display"></h1>
                 <button id="next-month-btn" class="icon-btn">›</button>
             </header>
+            <div class="calendar-weekdays">
+                <div>Sun</div>
+                <div>Mon</div>
+                <div>Tue</div>
+                <div>Wed</div>
+                <div>Thu</div>
+                <div>Fri</div>
+                <div>Sat</div>
+            </div>
             <div id="calendar-grid">
                 <!-- Calendar days injected by JS -->
             </div>
+            <button id="global-add-event-btn" class="fab">+</button>
         </div>
 
         <!-- View: Focus -->
@@ -115,6 +125,8 @@
         <div class="modal-content">
             <h2>New Event</h2>
             <input type="text" id="new-event-title" placeholder="Event Title (e.g. Lunch)">
+            <input type="date" id="new-event-date"
+                style="width: 100%; padding: 12px; margin-bottom: 20px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; outline: none;">
             <div class="time-inputs">
                 <input type="time" id="new-event-start" step="300">
                 <span>to</span>
