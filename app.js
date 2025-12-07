@@ -396,10 +396,32 @@ function dragDrop(e) {
         if (isNesting) {
             nestTask(dragStartIndex, dragEndIndex);
         } else {
-            if (!draggedTask.completed) {
-                if (firstCheckedIndex !== -1 && dragEndIndex >= firstCheckedIndex) {
-                    reorderTask(dragStartIndex, firstCheckedIndex > 0 ? firstCheckedIndex - 1 : 0);
-                    return;
+            // Enforce Sorting Boundaries
+            if (firstCheckedIndex !== -1) {
+                // Determine effective target index based on drop position (top/bottom of target)
+                // Note: dragEndIndex is just the index of the task we dropped ON.
+                // We need to know if we are inserting before or after.
+                // Simple reorderTask just puts it AT that index (shifting others).
+
+                // If dragging a PENDING task
+                if (!draggedTask.completed) {
+                    // Allowed range: 0 to firstCheckedIndex (exclusive of into checked zone)
+                    // Basically, if we try to put it at firstCheckedIndex or greater, it should snap to firstCheckedIndex (bottom of pending).
+                    // Actually, inserting AT firstCheckedIndex puts it *before* the first checked task. That IS allowed.
+                    // Inserting at firstCheckedIndex + 1 puts it *after* first checked. Not allowed.
+                    if (dragEndIndex > firstCheckedIndex) {
+                        reorderTask(dragStartIndex, firstCheckedIndex);
+                        return;
+                    }
+                }
+                // If dragging a COMPLETED task
+                else {
+                    // Allowed range: firstCheckedIndex to end.
+                    // Cannot put it before firstCheckedIndex.
+                    if (dragEndIndex < firstCheckedIndex) {
+                        reorderTask(dragStartIndex, firstCheckedIndex);
+                        return;
+                    }
                 }
             }
             reorderTask(dragStartIndex, dragEndIndex);
