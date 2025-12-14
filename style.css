@@ -180,7 +180,8 @@ header h1 {
     transition: transform 0.2s;
 
     /* Performance & Touch */
-    touch-action: none;
+    touch-action: manipulation;
+    /* Allow vertical scroll interactions, disable double-tap zoom */
     /* Prevent browser scroll while dragging */
     will-change: transform;
     /* Hint for GPU acceleration */
