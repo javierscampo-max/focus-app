@@ -1,5 +1,12 @@
 # Project Context: Productivity PWA
 
+## Core Philosophy (CRITICAL)
+1.  **SIMPLICITY IS KEY**: Make every task and code change as simple as possible. Avoid massive or complex changes. Every change should impact the minimum amount of code necessary.
+2.  **MINIMAL IMPACT**: Make all fixes and code changes impact ONLY the necessary code relevant to the task and NOTHING else. Do not introduce bugs.
+3.  **ROOT CAUSE ANALYSIS**: Do not be lazy. Never be lazy. If there is a bug, FIND THE ROOT CAUSE AND FIX IT. No temporary fixes. You are a Senior Developer.
+4.  **ALWAYS UPDATE RULES**: For every single request, feature, or change you make, YOU MUST UPDATE THIS `.cursorrules` FILE. It must always remain the single source of truth for the project's logic and rules.
+
+
 ## Overview
 This is a mobile-first Progressive Web App (PWA) designed for personal productivity. It combines three main features:
 1.  **Task Manager**: A simple to-do list.
@@ -11,6 +18,9 @@ This is a mobile-first Progressive Web App (PWA) designed for personal productiv
 -   **No Frameworks**: Pure DOM manipulation and `localStorage` for state.
 -   **Deployment**: Static hosting (e.g., Netlify Drop).
 -   **Styling**: Custom CSS with a "Midnight Mode" theme (Dark background `#0f172a`, Neon Blue accent `#38bdf8`).
+-   **Dependencies**: 
+    -   `mobile-drag-drop` polyfill is LOCAL (Offline ready).
+    -   **Service Worker**: `sw.js` caches all assets for 100% offline support.
 
 ## Key Features & Rules
 

@@ -12,8 +12,9 @@
     <meta name="theme-color" content="#0f172a">
     <link rel="apple-touch-icon" href="icon.png">
     <!-- Mobile Drag and Drop Polyfill -->
-    <script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0-rc.2/index.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0-rc.2/scroll-behaviour.min.js"></script>
+    <!-- Mobile Drag and Drop Polyfill (Local) -->
+    <script src="mobile-drag-drop.min.js"></script>
+    <script src="scroll-behaviour.min.js"></script>
     <script>
         // options are optional ;)
         MobileDragDrop.polyfill({
@@ -24,6 +25,19 @@
 
         // Fix for iOS scroll
         window.addEventListener('touchmove', function () { }, { passive: false });
+
+        // Register Service Worker for Offline Support
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
     </script>
 </head>
 
