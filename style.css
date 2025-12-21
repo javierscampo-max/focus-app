@@ -178,15 +178,6 @@ header h1 {
     /* Stack main content and sublist */
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s;
-
-    /* Performance & Touch */
-    touch-action: manipulation;
-    /* Allow vertical scroll interactions, disable double-tap zoom */
-    /* Prevent browser scroll while dragging */
-    will-change: transform;
-    /* Hint for GPU acceleration */
-    transform: translateZ(0);
-    /* Force GPU layer */
 }
 
 .task-main-content {
@@ -619,8 +610,6 @@ input[type="text"] {
 input[type="text"]:focus {
     border-color: var(--accent);
 }
-
-
 
 .modal-actions {
     display: flex;

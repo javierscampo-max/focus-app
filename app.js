@@ -69,24 +69,7 @@ const taskHeader = document.querySelector('.task-header');
         if (container === taskHeader || e.target.closest('.task-header')) {
             if (dragType === 'main') {
                 const item = tasks.splice(dragStartIndex, 1)[0];
-
-                // Enforce Sorting: Pending -> Top, Completed -> Top of Completed Section
-                if (!item.completed) {
-                    tasks.unshift(item);
-                } else {
-                    // It's completed, cannot go to 0 (unless no pending tasks).
-                    // Find first completed task in remaining list
-                    const firstChecked = tasks.findIndex(t => t.completed);
-                    if (firstChecked !== -1) {
-                        tasks.splice(firstChecked, 0, item);
-                    } else {
-                        // No other completed tasks found.
-                        // If list has pending tasks, completed goes to end.
-                        // If list is empty, goes to 0.
-                        tasks.push(item);
-                    }
-                }
-
+                tasks.unshift(item); // Move to Top
                 saveTasks();
                 renderTasks();
             } else if (dragType === 'sub') {
@@ -117,37 +100,35 @@ const taskHeader = document.querySelector('.task-header');
 
             if (dragType === 'main') {
                 const item = tasks.splice(dragStartIndex, 1)[0];
-                const firstCheckedIndex = tasks.findIndex(t => t.completed);
+                // If we removed from before the target, the target index shifted down by 1 in the *new* array?
+                // Wait.
+                // Case: [0, 1, 2, 3]. Move 0 to before 3.
+                // afterElement is 3. afterIndex is 3.
+                // remove 0. [1, 2, 3].
+                // We want to insert before 3. 3 is now at index 2.
+                // So target should be 2.
+                // My logic: if (0 < 3) target = 3 - 1 = 2. Correct.
 
-                // Enforce Sorting Boundaries
-                if (firstCheckedIndex !== -1) {
-                    // Pending Task -> Snap to bottom of pending if too low
-                    if (!item.completed) {
-                        if (targetIndex > firstCheckedIndex) {
-                            targetIndex = firstCheckedIndex;
-                        }
-                    }
-                    // Completed Task -> Snap to top of completed if too high
-                    else {
-                        if (targetIndex < firstCheckedIndex) {
-                            targetIndex = firstCheckedIndex;
-                        }
-                    }
+                // Case: [0, 1, 2, 3]. Move 3 to before 0.
+                // afterElement is 0. afterIndex is 0.
+                // remove 3. [0, 1, 2].
+                // We want to insert at 0.
+                // logic: if (3 < 0) false. target = 0. Correct.
+
+                // What if targetIndex is tasks.length?
+                // Move 0 to end (null).
+                // remove 0. push to end. Correct.
+
+                // Boundary: Move 0 to before 1?
+                // afterElement is 1. index 1.
+                // target = 1 - 1 = 0.
+                // remove 0. insert at 0. Noop. Correct.
+
+                if (afterElement == null) {
+                    tasks.push(item);
                 } else {
-                    // No other completed tasks found.
-                    // If we are dragging a COMPLETED task, it must go to the very end of the pending list.
-                    if (item.completed) {
-                        targetIndex = tasks.length;
-                    }
-                    // If dragging a PENDING task, it's fine anywhere (no boundaries).
+                    tasks.splice(targetIndex, 0, item);
                 }
-
-                // Insert
-                // Ensure targetIndex is within bounds (0 to length)
-                if (targetIndex > tasks.length) targetIndex = tasks.length;
-                if (targetIndex < 0) targetIndex = 0;
-
-                tasks.splice(targetIndex, 0, item);
 
                 saveTasks();
                 renderTasks();
@@ -332,16 +313,8 @@ function dragLeave(e) {
     this.classList.remove('nest-target');
 }
 
-// Throttling state for dragOver
-let lastDragOverTime = 0;
-
 function dragOver(e) {
     e.preventDefault();
-
-    // Throttle: Max 25fps (40ms) to reduce mobile lag
-    const now = Date.now();
-    if (now - lastDragOverTime < 40) return;
-    lastDragOverTime = now;
 
     // Auto-Scroll Check
     const scrollContainer = taskList.parentElement;
@@ -373,9 +346,8 @@ function dragOver(e) {
         const draggedTask = tasks[dragStartIndex];
         const hasSubtasks = draggedTask.subtasks && draggedTask.subtasks.length > 0;
 
-        // Nesting Zone: Reduced to Middle 40% (30% to 70%) to make reordering easier
-        // Reordering zones are now Top 30% and Bottom 30%
-        if (!hasSubtasks && offset > height * 0.3 && offset < height * 0.7) {
+        // Nesting Zone: Expanded to Middle 80% (10% to 90%)
+        if (!hasSubtasks && offset > height * 0.1 && offset < height * 0.9) {
             const targetIndex = +item.dataset.index;
             if (targetIndex !== dragStartIndex) {
                 item.classList.add('nest-target');
@@ -384,8 +356,7 @@ function dragOver(e) {
             item.classList.add('drag-over');
         }
     } else if (dragType === 'sub') {
-        // Subtasks match the same feel
-        const isNesting = (offset > height * 0.3 && offset < height * 0.7);
+        const isNesting = (offset > height * 0.1 && offset < height * 0.9);
         if (isNesting) {
             item.classList.add('nest-target');
         } else {
@@ -420,37 +391,14 @@ function dragDrop(e) {
         const rect = targetMain.getBoundingClientRect();
         const offset = e.clientY - rect.top;
         const height = rect.height;
-
-        // Consistent 30%-70% Nesting Zone
-        const isNesting = !hasSubtasks && (offset > height * 0.3 && offset < height * 0.7);
+        const isNesting = !hasSubtasks && (offset > height * 0.1 && offset < height * 0.9);
 
         if (isNesting) {
             nestTask(dragStartIndex, dragEndIndex);
         } else {
-            // Enforce Sorting Boundaries
-            if (firstCheckedIndex !== -1) {
-                // Pending Task -> Snap to bottom of pending if too low
-                if (!draggedTask.completed) {
-                    if (dragEndIndex > firstCheckedIndex) {
-                        reorderTask(dragStartIndex, firstCheckedIndex);
-                        return;
-                    }
-                }
-                // Completed Task -> Snap to top of completed if too high
-                else {
-                    if (dragEndIndex < firstCheckedIndex) {
-                        reorderTask(dragStartIndex, firstCheckedIndex);
-                        return;
-                    }
-                }
-            } else {
-                // No other completed tasks.
-                // If dragging a COMPLETED task, it must go to the end.
-                if (draggedTask.completed) {
-                    // We can just move it to the end.
-                    // Note: dragEndIndex might be the last index already.
-                    // Force to end just in case user tried to drop it higher.
-                    reorderTask(dragStartIndex, tasks.length);
+            if (!draggedTask.completed) {
+                if (firstCheckedIndex !== -1 && dragEndIndex >= firstCheckedIndex) {
+                    reorderTask(dragStartIndex, firstCheckedIndex > 0 ? firstCheckedIndex - 1 : 0);
                     return;
                 }
             }
