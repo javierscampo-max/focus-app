@@ -1,4 +1,4 @@
-const CACHE_NAME = 'productivity-pwa-v1';
+const CACHE_NAME = 'productivity-pwa-v2'; // Bumped version to force update
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
