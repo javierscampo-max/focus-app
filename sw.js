@@ -45,7 +45,14 @@ self.addEventListener('fetch', (event) => {
                 if (response) {
                     return response;
                 }
-                return fetch(event.request);
+
+                // Network request
+                return fetch(event.request).catch(() => {
+                    // Start of offline fallback
+                    // If we are offline and these requests fail, just return nothing 
+                    // (prevents 'Turn off Airplane Mode' popup some of the time)
+                    console.log('Offline fetch failed:', event.request.url);
+                });
             })
     );
 });
