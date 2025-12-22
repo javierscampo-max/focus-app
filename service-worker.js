@@ -1,4 +1,4 @@
-const CACHE_NAME = 'productivity-pwa-v14'; // v14: New Icon V2
+const CACHE_NAME = 'productivity-pwa-v15'; // v15: Ignore Search Params
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -50,7 +50,7 @@ self.addEventListener('fetch', (event) => {
 
 
     event.respondWith(
-        caches.match(event.request)
+        caches.match(event.request, { ignoreSearch: true })
             .then((response) => {
                 // Cache hit
                 if (response) {

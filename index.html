@@ -725,8 +725,8 @@
         // Register Service Worker for Offline Support
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // v13: New Filename (Cache Breaker)
-                navigator.serviceWorker.register('service-worker.js')
+                // v15: Ignore Search Params
+                navigator.serviceWorker.register('service-worker.js?v=15')
                     .then(registration => {
                         console.log('ServiceWorker registration successful with scope: ', registration.scope);
                     })
