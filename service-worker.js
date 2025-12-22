@@ -1,10 +1,10 @@
-const CACHE_NAME = 'productivity-pwa-v13'; // v13: New Filename
+const CACHE_NAME = 'productivity-pwa-v14'; // v14: New Icon V2
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
     './app.js',
     './manifest.json',
-    './app-icon.png',
+    './icon-v2.png',
     './mobile-drag-drop.min.js',
     './scroll-behaviour.min.js'
 ];
