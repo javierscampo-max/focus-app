@@ -76,8 +76,8 @@ This is a mobile-first Progressive Web App (PWA) designed for personal productiv
 
 ## File Structure
 -   `index.html`: Main entry point, contains all views and modals.
--   `style.css`: All styling.
--   `app.js`: Application logic, event listeners, and state management.
+    -   **main.css** (Core styling)
+    -   `app.js` (App logic)ation logic, event listeners, and state management.
 -   `manifest.json`: PWA configuration.
 
 ## Deployment Instructions

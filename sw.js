@@ -2,7 +2,7 @@ const CACHE_NAME = 'productivity-pwa-v6';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
-    './style.css',
+    './main.css',
     './app.js',
     './manifest.json',
     './icon.png',
