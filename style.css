@@ -273,7 +273,6 @@ header h1 {
     margin-left: 12px;
     padding-left: 12px;
     border-left: 2px solid var(--card-bg);
-    /* Guide line? Maybe subtle border */
     border-left: 2px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -647,7 +646,7 @@ input[type="text"]:focus {
 }
 
 /* Reorder indicator */
-/* Reorder indicator - Removed per user request */
+
 
 /* Nesting indicator */
 .task-item.nest-target {
