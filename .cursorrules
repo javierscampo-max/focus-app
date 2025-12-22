@@ -20,7 +20,7 @@ This is a mobile-first Progressive Web App (PWA) designed for personal productiv
 -   **Styling**: Custom CSS with a "Midnight Mode" theme (Dark background `#0f172a`, Neon Blue accent `#38bdf8`).
 -   **Dependencies**: 
     -   `mobile-drag-drop` polyfill is LOCAL (Offline ready).
-    -   **Service Worker**: `service-worker.js` caches all assets for 100% offline support.
+    -   **Service Worker**: `sw.js` caches all assets for 100% offline support.
 
 ## Key Features & Rules
 

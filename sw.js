@@ -1,11 +1,11 @@
-const CACHE_NAME = 'productivity-pwa-v5'; // Bump to v5 - Navigation Fallback
+const CACHE_NAME = 'productivity-pwa-v6'; // Bump to v6 (Rescue Mission)
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
     './style.css',
     './app.js',
     './manifest.json',
-    './icon.png', // Restored (Verified it exists)
+    './icon.png',
     './mobile-drag-drop.min.js',
     './scroll-behaviour.min.js'
 ];
@@ -40,24 +40,38 @@ self.addEventListener('activate', (event) => {
 
 // Fetch Event: Serve from Cache -> Network -> Offline Fallback
 self.addEventListener('fetch', (event) => {
+    // 1. Strict Offline Check (Blocks "Turn off Airplane Mode" popup)
+    if (!navigator.onLine && event.request.url.startsWith('http')) {
+        // If it's a navigation (HTML), try cache then fallback
+        if (event.request.mode === 'navigate') {
+            event.respondWith(
+                caches.match(event.request).then(response => {
+                    return response || caches.match('./index.html');
+                })
+            );
+            return;
+        }
+        // Otherwise (images, api), just kill it silently
+        event.respondWith(new Response('', { status: 200, statusText: 'Offline' }));
+        return;
+    }
+
     event.respondWith(
         caches.match(event.request)
             .then((response) => {
-                // 1. Cache hit
+                // Cache hit
                 if (response) {
                     return response;
                 }
 
-                // 2. Network request
+                // Network request
                 return fetch(event.request).catch((error) => {
                     console.log('Fetch failed:', error);
-
-                    // 3. Offline Fallback for Navigation (The blank screen fix)
+                    // Offline Fallback for Navigation
                     if (event.request.mode === 'navigate') {
                         return caches.match('./index.html');
                     }
-
-                    // 4. Silent failure for other assets (The popup fix)
+                    // Silent failure for assets
                     return new Response('', { status: 200, statusText: 'Offline' });
                 });
             })
