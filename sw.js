@@ -1,4 +1,4 @@
-const CACHE_NAME = 'productivity-pwa-v6';
+const CACHE_NAME = 'productivity-pwa-v7'; // v7: Resilient Caching
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -10,15 +10,23 @@ const ASSETS_TO_CACHE = [
     './scroll-behaviour.min.js'
 ];
 
-// Install Event: Cache Files
+// Install Event: Cache Files (Resilient Strategy)
 self.addEventListener('install', (event) => {
     self.skipWaiting();
     event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then((cache) => {
-                console.log('Opened cache');
-                return cache.addAll(ASSETS_TO_CACHE);
-            })
+        caches.open(CACHE_NAME).then((cache) => {
+            // "Resilient" caching:
+            // Instead of crashing if one file fails (cache.addAll),
+            // we try to cache them one by one.
+            return Promise.all(
+                ASSETS_TO_CACHE.map(url => {
+                    return cache.add(url).catch(err => {
+                        console.error('Failed to cache:', url, err);
+                        // We swallow the error so installation CONTINUES
+                    });
+                })
+            );
+        })
     );
 });
 
