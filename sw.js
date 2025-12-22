@@ -1,10 +1,10 @@
-const CACHE_NAME = 'productivity-pwa-v11'; // v11: Simplified Fetch
+const CACHE_NAME = 'productivity-pwa-v12'; // v12: Renamed Icon
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
     './app.js',
     './manifest.json',
-    './icon.png',
+    './app-icon.png',
     './mobile-drag-drop.min.js',
     './scroll-behaviour.min.js'
 ];
