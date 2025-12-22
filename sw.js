@@ -1,18 +1,18 @@
-const CACHE_NAME = 'productivity-pwa-v4'; // Bump to v4 (Fixing installation crash)
+const CACHE_NAME = 'productivity-pwa-v5'; // Bump to v5 - Navigation Fallback
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
     './style.css',
     './app.js',
     './manifest.json',
-    // './icon.png', // REMOVED: File does not exist, caused SW install to crash!
+    './icon.png', // Restored (Verified it exists)
     './mobile-drag-drop.min.js',
     './scroll-behaviour.min.js'
 ];
 
 // Install Event: Cache Files
 self.addEventListener('install', (event) => {
-    self.skipWaiting(); // Force activation immediately
+    self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => {
@@ -35,33 +35,29 @@ self.addEventListener('activate', (event) => {
             );
         })
     );
-    self.clients.claim(); // Take control of all clients immediately
+    self.clients.claim();
 });
 
-// Fetch Event: Serve from Cache or Fetch from Network
+// Fetch Event: Serve from Cache -> Network -> Offline Fallback
 self.addEventListener('fetch', (event) => {
-    // Ignore Google Analytics or other external non-critical stuff if offline
-    if (event.request.url.startsWith('http') && !navigator.onLine) {
-        // Return empty response immediately to prevent "Network Error" popup
-        return new Response('', { status: 200, statusText: 'Offline' });
-    }
-
     event.respondWith(
         caches.match(event.request)
             .then((response) => {
-                // Cache hit - return response
+                // 1. Cache hit
                 if (response) {
                     return response;
                 }
 
-                // If we are completely offline, do NOT try to fetch
-                if (!navigator.onLine) {
-                    return new Response('', { status: 200, statusText: 'Offline' });
-                }
+                // 2. Network request
+                return fetch(event.request).catch((error) => {
+                    console.log('Fetch failed:', error);
 
-                // Network request
-                return fetch(event.request).catch(() => {
-                    // Fallback for failed fetches
+                    // 3. Offline Fallback for Navigation (The blank screen fix)
+                    if (event.request.mode === 'navigate') {
+                        return caches.match('./index.html');
+                    }
+
+                    // 4. Silent failure for other assets (The popup fix)
                     return new Response('', { status: 200, statusText: 'Offline' });
                 });
             })
