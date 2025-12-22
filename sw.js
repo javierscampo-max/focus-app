@@ -1,4 +1,4 @@
-const CACHE_NAME = 'productivity-pwa-v2'; // Bumped version to force update
+const CACHE_NAME = 'productivity-pwa-v3'; // Bumped version to force update
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -12,6 +12,7 @@ const ASSETS_TO_CACHE = [
 
 // Install Event: Cache Files
 self.addEventListener('install', (event) => {
+    self.skipWaiting(); // Force activation immediately
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => {
@@ -34,10 +35,17 @@ self.addEventListener('activate', (event) => {
             );
         })
     );
+    self.clients.claim(); // Take control of all clients immediately
 });
 
 // Fetch Event: Serve from Cache or Fetch from Network
 self.addEventListener('fetch', (event) => {
+    // Ignore Google Analytics or other external non-critical stuff if offline
+    if (event.request.url.startsWith('http') && !navigator.onLine) {
+        // Return empty response immediately to prevent "Network Error" popup
+        return new Response('', { status: 200, statusText: 'Offline' });
+    }
+
     event.respondWith(
         caches.match(event.request)
             .then((response) => {
@@ -46,12 +54,15 @@ self.addEventListener('fetch', (event) => {
                     return response;
                 }
 
+                // If we are completely offline, do NOT try to fetch
+                if (!navigator.onLine) {
+                    return new Response('', { status: 200, statusText: 'Offline' });
+                }
+
                 // Network request
                 return fetch(event.request).catch(() => {
-                    // Start of offline fallback
-                    // If we are offline and these requests fail, just return nothing 
-                    // (prevents 'Turn off Airplane Mode' popup some of the time)
-                    console.log('Offline fetch failed:', event.request.url);
+                    // Fallback for failed fetches
+                    return new Response('', { status: 200, statusText: 'Offline' });
                 });
             })
     );
