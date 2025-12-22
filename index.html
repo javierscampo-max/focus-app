@@ -724,8 +724,8 @@
         // Register Service Worker for Offline Support
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // version 8: Cache Busting Query Param
-                navigator.serviceWorker.register('sw.js?v=8')
+                // version 10: Ghost Files
+                navigator.serviceWorker.register('sw.js?v=10')
                     .then(registration => {
                         console.log('ServiceWorker registration successful with scope: ', registration.scope);
                     })

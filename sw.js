@@ -1,4 +1,4 @@
-const CACHE_NAME = 'productivity-pwa-v9'; // v9: Inlined CSS
+const CACHE_NAME = 'productivity-pwa-v10'; // v10: Ghost Files
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -78,8 +78,9 @@ self.addEventListener('fetch', (event) => {
                     if (event.request.mode === 'navigate') {
                         return caches.match('./index.html');
                     }
-                    // Silent failure for assets
-                    return new Response('', { status: 200, statusText: 'Offline' });
+                    // AGGRESSIVE FALLBACK: Return empty 200 OK for everything else (images, icons, etc)
+                    // This creates a "ghost" file instead of an error, silencing the OS popup.
+                    return new Response('', { status: 200, statusText: 'Offline', headers: { 'Content-Type': 'text/plain' } });
                 });
             })
     );
