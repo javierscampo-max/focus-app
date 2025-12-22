@@ -1,11 +1,11 @@
-const CACHE_NAME = 'productivity-pwa-v3'; // Bumped version to force update
+const CACHE_NAME = 'productivity-pwa-v4'; // Bump to v4 (Fixing installation crash)
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
     './style.css',
     './app.js',
     './manifest.json',
-    './icon.png',
+    // './icon.png', // REMOVED: File does not exist, caused SW install to crash!
     './mobile-drag-drop.min.js',
     './scroll-behaviour.min.js'
 ];
