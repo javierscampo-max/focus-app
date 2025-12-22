@@ -75,8 +75,7 @@ This is a mobile-first Progressive Web App (PWA) designed for personal productiv
 -   **Scrollbars**: Custom thin, rounded, dark scrollbars for a premium feel on non-mobile devices (or where visible).
 
 ## File Structure
--   `index.html`: Main entry point, contains all views and modals.
-    -   **main.css** (Core styling)
+-   `index.html`: Main entry point (includes inlined CSS).
     -   `app.js` (App logic)ation logic, event listeners, and state management.
 -   `manifest.json`: PWA configuration.
 

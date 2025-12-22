@@ -1,8 +1,7 @@
-const CACHE_NAME = 'productivity-pwa-v7'; // v7: Resilient Caching
+const CACHE_NAME = 'productivity-pwa-v9'; // v9: Inlined CSS
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
-    './main.css',
     './app.js',
     './manifest.json',
     './icon.png',
