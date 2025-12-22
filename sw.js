@@ -1,4 +1,4 @@
-const CACHE_NAME = 'productivity-pwa-v10'; // v10: Ghost Files
+const CACHE_NAME = 'productivity-pwa-v11'; // v11: Simplified Fetch
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -47,21 +47,7 @@ self.addEventListener('activate', (event) => {
 
 // Fetch Event: Serve from Cache -> Network -> Offline Fallback
 self.addEventListener('fetch', (event) => {
-    // 1. Strict Offline Check (Blocks "Turn off Airplane Mode" popup)
-    if (!navigator.onLine && event.request.url.startsWith('http')) {
-        // If it's a navigation (HTML), try cache then fallback
-        if (event.request.mode === 'navigate') {
-            event.respondWith(
-                caches.match(event.request).then(response => {
-                    return response || caches.match('./index.html');
-                })
-            );
-            return;
-        }
-        // Otherwise (images, api), just kill it silently
-        event.respondWith(new Response('', { status: 200, statusText: 'Offline' }));
-        return;
-    }
+
 
     event.respondWith(
         caches.match(event.request)
