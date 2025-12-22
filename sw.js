@@ -1,4 +1,4 @@
-const CACHE_NAME = 'productivity-pwa-v6'; // Bump to v6 (Rescue Mission)
+const CACHE_NAME = 'productivity-pwa-v6';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',

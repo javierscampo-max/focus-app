@@ -44,11 +44,9 @@ const taskHeader = document.querySelector('.task-header');
         if (e.clientY < listRect.top + scrollThreshold) {
             scrollSpeed = -15;
             startAutoScroll();
-            // console.log('Container Scroll Up');
         } else if (e.clientY > listRect.bottom - scrollThreshold) {
             scrollSpeed = 15;
             startAutoScroll();
-            // console.log('Container Scroll Down');
         } else {
             stopAutoScroll();
         }
