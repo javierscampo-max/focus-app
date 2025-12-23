@@ -725,6 +725,24 @@
         // Register Service Worker for Offline Support
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
+                // v15: Ignore Search Params
+                navigator.serviceWorker.register('service-worker.js?v=15')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <!-- App Container -->
+    <div id="app">
+        <!-- View: Tasks -->
+        <div id="view-tasks" class="view active">
             <header class="task-header">
                 <div>
                     <h1>My Tasks (Fresh Start)</h1>
@@ -739,9 +757,9 @@
                 </div>
             </div>
             <button id="add-task-btn" class="fab">+</button>
-        </div >
+        </div>
 
-        < !--View: Calendar-- >
+        <!-- View: Calendar -->
         <div id="view-calendar" class="view">
             <header class="calendar-header">
                 <button id="prev-month-btn" class="icon-btn">‹</button>
@@ -763,7 +781,7 @@
             <button id="global-add-event-btn" class="fab">+</button>
         </div>
 
-        <!--View: Focus-- >
+        <!-- View: Focus -->
         <div id="view-focus" class="view">
             <header>
                 <h1>Focus Mode</h1>
@@ -786,24 +804,77 @@
             </div>
         </div>
 
-        <!--Bottom Navigation-- >
-                    <nav id="bottom-nav">
-                        <button class="nav-item active" data-target="view-tasks">
-                            <span class="icon">📝</span>
-                            <span class="label">Tasks</span>
-                        </button>
-                        <button class="nav-item" data-target="view-calendar">
-                            <span class="icon">📅</span>
-                            <span class="label">Calendar</span>
-                        </button>
-                        <button class="nav-item" data-target="view-focus">
-                            <span class="icon">🎯</span>
-                            <span class="label">Focus</span>
-                        </button>
-                    </nav>
-    </div >
+        <!-- Bottom Navigation -->
+        <nav id="bottom-nav">
+            <button class="nav-item active" data-target="view-tasks">
+                <span class="icon">📝</span>
+                <span class="label">Tasks</span>
+            </button>
+            <button class="nav-item" data-target="view-calendar">
+                <span class="icon">📅</span>
+                <span class="label">Calendar</span>
+            </button>
+            <button class="nav-item" data-target="view-focus">
+                <span class="icon">🎯</span>
+                <span class="label">Focus</span>
+            </button>
+        </nav>
+    </div>
 
-    < !--Modals -->
+    <!-- Modals (Hidden by default) -->
+    <div id="task-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Add Task</h2>
+            <input type="text" id="task-input" placeholder="What needs to be done?">
+            <div class="modal-actions">
+                <button id="cancel-task-btn">Cancel</button>
+                <button id="save-task-btn" class="primary-btn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full Screen Event Modal -->
+    <div id="event-modal" class="modal hidden full-screen">
+        <div class="modal-content full-screen-content">
+            <div class="modal-header">
+                <button id="cancel-event-btn">Cancel</button>
+                <h2 id="event-modal-title">New Event</h2>
+                <button id="save-event-btn" class="primary-btn">Add</button>
+            </div>
+            <div id="day-timeline">
+                <!-- 00:00 to 23:00 Slots -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Input Modal (Nested for simplicity) -->
+    <div id="event-input-modal" class="modal hidden" style="z-index: 200;">
+        <div class="modal-content">
+            <h2>Event Details</h2>
+            <input type="text" id="event-title-input" placeholder="Event Title">
+            <div class="time-inputs">
+                <input type="time" id="event-start-time">
+                <span>to</span>
+                <input type="time" id="event-end-time">
+            </div>
+            <div class="modal-actions">
+                <button id="cancel-event-input-btn">Back</button>
+                <button id="confirm-event-btn" class="primary-btn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Logic -->
+    <script src="app.js"></script>
+</body>
+
+</html>
+<span class="label">Focus</span>
+</button>
+</nav>
+</div>
+
+< !--Modals -->
     <div id="task-modal" class="modal hidden">
         <div class="modal-content">
             <h2>New Task</h2>
@@ -825,8 +896,8 @@
             </header>
             <div id="day-timeline">
                 <!-- Hours injected by JS -->
-            </div>
-        </div>
+    </div>
+    </div>
     </div>
 
     <div id="event-modal" class="modal hidden">
@@ -850,4 +921,4 @@
     <script src="app.js"></script>
     </body>
 
-</html>
+    </html>
