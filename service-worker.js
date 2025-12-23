@@ -1,4 +1,4 @@
-const CACHE_NAME = 'productivity-pwa-v16'; // v16: Fresh Mode Identity
+const CACHE_NAME = 'productivity-pwa-v17'; // v17: Force Cache Update
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
