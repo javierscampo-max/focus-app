@@ -1,4 +1,4 @@
-const CACHE_NAME = 'productivity-pwa-v15'; // v15: Ignore Search Params
+const CACHE_NAME = 'productivity-pwa-v16'; // v16: Fresh Mode Identity
 const ASSETS_TO_CACHE = [
     './',
     './index.html',

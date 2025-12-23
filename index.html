@@ -725,26 +725,9 @@
         // Register Service Worker for Offline Support
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // v15: Ignore Search Params
-                navigator.serviceWorker.register('service-worker.js?v=15')
-                    .then(registration => {
-                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                    })
-                    .catch(err => {
-                        console.log('ServiceWorker registration failed: ', err);
-                    });
-            });
-        }
-    </script>
-</head>
-
-<body>
-    <div id="app">
-        <!-- View: Tasks -->
-        <div id="view-tasks" class="view active">
             <header class="task-header">
                 <div>
-                    <h1>My Tasks (v14)</h1>
+                    <h1>My Tasks (Fresh Start)</h1>
                     <p class="subtitle">Let's get things done.</p>
                 </div>
                 <div id="task-count">0 left</div>
@@ -756,9 +739,9 @@
                 </div>
             </div>
             <button id="add-task-btn" class="fab">+</button>
-        </div>
+        </div >
 
-        <!-- View: Calendar -->
+        < !--View: Calendar-- >
         <div id="view-calendar" class="view">
             <header class="calendar-header">
                 <button id="prev-month-btn" class="icon-btn">‹</button>
@@ -780,7 +763,7 @@
             <button id="global-add-event-btn" class="fab">+</button>
         </div>
 
-        <!-- View: Focus -->
+        <!--View: Focus-- >
         <div id="view-focus" class="view">
             <header>
                 <h1>Focus Mode</h1>
@@ -803,24 +786,24 @@
             </div>
         </div>
 
-        <!-- Bottom Navigation -->
-        <nav id="bottom-nav">
-            <button class="nav-item active" data-target="view-tasks">
-                <span class="icon">📝</span>
-                <span class="label">Tasks</span>
-            </button>
-            <button class="nav-item" data-target="view-calendar">
-                <span class="icon">📅</span>
-                <span class="label">Calendar</span>
-            </button>
-            <button class="nav-item" data-target="view-focus">
-                <span class="icon">🎯</span>
-                <span class="label">Focus</span>
-            </button>
-        </nav>
-    </div>
+        <!--Bottom Navigation-- >
+                    <nav id="bottom-nav">
+                        <button class="nav-item active" data-target="view-tasks">
+                            <span class="icon">📝</span>
+                            <span class="label">Tasks</span>
+                        </button>
+                        <button class="nav-item" data-target="view-calendar">
+                            <span class="icon">📅</span>
+                            <span class="label">Calendar</span>
+                        </button>
+                        <button class="nav-item" data-target="view-focus">
+                            <span class="icon">🎯</span>
+                            <span class="label">Focus</span>
+                        </button>
+                    </nav>
+    </div >
 
-    <!-- Modals -->
+    < !--Modals -->
     <div id="task-modal" class="modal hidden">
         <div class="modal-content">
             <h2>New Task</h2>
@@ -832,7 +815,7 @@
         </div>
     </div>
 
-    <!-- Day View Modal (Full Screen) -->
+    <!--Day View Modal(Full Screen)-- >
     <div id="day-view-modal" class="modal full-screen hidden">
         <div class="modal-content full-screen-content">
             <header class="modal-header">
@@ -865,6 +848,6 @@
     </div>
 
     <script src="app.js"></script>
-</body>
+    </body>
 
 </html>

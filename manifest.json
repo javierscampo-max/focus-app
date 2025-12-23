@@ -1,7 +1,7 @@
 {
   "name": "Focus App",
   "short_name": "Focus",
-  "start_url": "index.html",
+  "start_url": "index.html?mode=fresh",
   "scope": ".",
   "display": "standalone",
   "background_color": "#0f172a",
