@@ -1,4 +1,4 @@
-const CACHE_NAME = 'productivity-pwa-v18'; // v18: Plan B Magic Link
+const CACHE_NAME = 'productivity-pwa-v19'; // v19: app.html Primary Fallback
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -63,7 +63,7 @@ self.addEventListener('fetch', (event) => {
                     console.log('Fetch failed:', error);
                     // Offline Fallback for Navigation
                     if (event.request.mode === 'navigate') {
-                        return caches.match('./index.html');
+                        return caches.match('./app.html');
                     }
                     // AGGRESSIVE FALLBACK: Return empty 200 OK for everything else (images, icons, etc)
                     // This creates a "ghost" file instead of an error, silencing the OS popup.
