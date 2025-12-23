@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Focus App</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.3);
+            --danger: #ef4444;
+            --success: #22c55e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            /* Slightly lighter than card-bg for visibility */
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #app {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .view {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            padding-bottom: 100px;
+            /* Space for nav */
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        header {
+            margin-bottom: 24px;
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+            /* Reserve space for border */
+            border-radius: 12px;
+        }
+
+        #task-count {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        /* Buttons */
+        .primary-btn {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .secondary-btn {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* Tasks */
+
+        /* Task View Specifics */
+        #view-tasks {
+            display: none;
+            flex-direction: column;
+            /* Override .view scroll */
+            overflow: hidden !important;
+            height: 100%;
+        }
+
+        #view-tasks.active {
+            display: flex;
+        }
+
+        #task-list {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-bottom: 80px;
+            min-height: 200px;
+            transition: background-color 0.2s;
+            /* Internal scrolling */
+            overflow-y: auto;
+            /* Smooth scroll */
+            scroll-behavior: smooth;
+        }
+
+        .task-item {
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 0;
+            /* Handled by gap on parent now */
+            display: flex;
+            flex-direction: column;
+            /* Stack main content and sublist */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .task-main-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .task-item:active {
+            transform: scale(0.98);
+        }
+
+        .task-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .task-item.completed .task-checkbox {
+            background: var(--accent);
+        }
+
+        .task-text {
+            flex: 1;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            min-width: 0;
+            line-height: 1.4;
+            padding-right: 8px;
+        }
+
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            font-size: 1.2rem;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            margin-left: 8px;
+            /* Visual spacing */
+            border-radius: 50%;
+        }
+
+        .delete-btn:active {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .collapse-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+            line-height: 0;
+            padding-bottom: 2px;
+            /* Optical adjustment for text characters */
+            border-radius: 50%;
+        }
+
+        .collapse-btn:active {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .collapse-btn.open {
+            transform: rotate(90deg);
+        }
+
+        .subtask-list {
+            margin-top: 8px;
+            margin-left: 12px;
+            padding-left: 12px;
+            border-left: 2px solid var(--card-bg);
+            border-left: 2px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .subtask-list.collapsed {
+            display: none;
+        }
+
+        .fab {
+            position: fixed;
+            bottom: 90px;
+            right: 24px;
+            width: 64px;
+            height: 64px;
+            border-radius: 32px;
+            background: var(--accent);
+            border: none;
+            color: #fff;
+            font-size: 32px;
+            box-shadow: 0 4px 20px var(--accent-glow);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            line-height: 0;
+            padding-bottom: 4px;
+            /* Optical adjustment for + */
+        }
+
+        /* Calendar */
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 8px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        #calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--card-bg);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .calendar-day.today {
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .calendar-day.has-event::after {
+            content: '';
+            width: 4px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 50%;
+            position: absolute;
+            bottom: 4px;
+        }
+
+        .calendar-day.selected {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        /* Calendar Header */
+        .calendar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: none;
+            color: var(--accent);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        /* Day View Modal */
+        .modal.full-screen {
+            align-items: flex-end;
+            /* Slide up effect */
+        }
+
+        .modal-content.full-screen-content {
+            width: 100%;
+            height: 95%;
+            max-width: none;
+            border-radius: 24px 24px 0 0;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--card-bg);
+        }
+
+        #day-timeline {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            position: relative;
+            /* For absolute events */
+        }
+
+        .time-slot {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            height: 60px;
+            /* Fixed height for pixel math */
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .time-label {
+            width: 60px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            padding-top: 8px;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Events now float over the slots */
+        .timeline-event {
+            position: absolute;
+            left: 70px;
+            /* After time label */
+            right: 10px;
+            background: rgba(56, 189, 248, 0.2);
+            border-left: 3px solid var(--accent);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            overflow: hidden;
+            z-index: 5;
+        }
+
+        /* Focus */
+        .timer-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 60vh;
+        }
+
+        .timer-circle {
+            width: 250px;
+            height: 250px;
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        circle {
+            fill: transparent;
+            /* Fix black spot */
+            stroke-width: 6;
+            stroke-linecap: round;
+        }
+
+        .bg-ring {
+            stroke: var(--card-bg);
+        }
+
+        .progress-ring {
+            stroke: var(--accent);
+            stroke-dasharray: 283;
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 1s linear;
+        }
+
+        #timer-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Timer Controls */
+        .timer-controls {
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .timer-controls label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--accent);
+        }
+
+        /* Time Inputs */
+        .time-inputs {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+            color: var(--text-secondary);
+        }
+
+        input[type="time"] {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 8px;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        /* Nav */
+        #bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 80px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: env(safe-area-inset-bottom);
+            z-index: 20;
+        }
+
+        .nav-item {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .nav-item.active {
+            color: var(--accent);
+        }
+
+        .nav-item .icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        /* Modals */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.hidden {
+            display: none;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            width: 90%;
+            max-width: 400px;
+            padding: 24px;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content h2 {
+            margin-bottom: 16px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .modal-actions button {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        #cancel-task-btn,
+        #cancel-event-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Subtasks & Drag Drop */
+        .task-item[draggable="true"] {
+            cursor: grab;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .task-item.dragging {
+            opacity: 0.5;
+            transform: scale(0.98);
+        }
+
+        /* Reorder indicator */
+
+
+        /* Nesting indicator */
+        .task-item.nest-target {
+            border: 2px solid var(--success);
+            background: rgba(34, 197, 94, 0.1);
+            box-shadow: inset 0 0 15px rgba(34, 197, 94, 0.2);
+        }
+
+        .subtask-list {
+            margin-left: 20px;
+            margin-top: 8px;
+            padding-left: 12px;
+            border-left: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .subtask-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .subtask-item .task-checkbox {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+        }
+
+        .subtask-item .task-text {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .subtask-item.completed .task-text {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .delete-btn.small {
+            font-size: 1rem;
+            padding: 2px;
+        }
+    </style>
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="apple-touch-icon" href="icon-v2.png">
+    <link rel="icon" type="image/png" href="icon-v2.png">
+
+    <!-- Mobile Drag and Drop Polyfill (Local) -->
+    <script src="mobile-drag-drop.min.js"></script>
+    <script src="scroll-behaviour.min.js"></script>
+    <script>
+        // options are optional ;)
+        MobileDragDrop.polyfill({
+            // use this to make use of the scroll behaviour
+            dragImageTranslateOverride: MobileDragDrop.scrollBehaviourDragImageTranslateOverride,
+            holdToDrag: 150
+        });
+
+        // Fix for iOS scroll
+        window.addEventListener('touchmove', function () { }, { passive: false });
+
+        // Register Service Worker for Offline Support
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // v17: Force Cache Update
+                navigator.serviceWorker.register('service-worker.js?v=17')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <!-- App Container -->
+    <div id="app">
+        <!-- View: Tasks -->
+        <div id="view-tasks" class="view active">
+            <header class="task-header">
+                <div>
+                    <h1>My Tasks (v17 Fixed)</h1>
+                    <p class="subtitle">Let's get things done.</p>
+                </div>
+                <div id="task-count">0 left</div>
+            </header>
+            <div id="task-list">
+                <!-- Tasks will be injected here by JS -->
+                <div class="empty-state">
+                    <p>No tasks yet. Tap + to add one.</p>
+                </div>
+            </div>
+            <button id="add-task-btn" class="fab">+</button>
+        </div>
+
+        <!-- View: Calendar -->
+        <div id="view-calendar" class="view">
+            <header class="calendar-header">
+                <button id="prev-month-btn" class="icon-btn">‹</button>
+                <h1 id="current-month-display"></h1>
+                <button id="next-month-btn" class="icon-btn">›</button>
+            </header>
+            <div class="calendar-weekdays">
+                <div>Sun</div>
+                <div>Mon</div>
+                <div>Tue</div>
+                <div>Wed</div>
+                <div>Thu</div>
+                <div>Fri</div>
+                <div>Sat</div>
+            </div>
+            <div id="calendar-grid">
+                <!-- Calendar days injected by JS -->
+            </div>
+            <button id="global-add-event-btn" class="fab">+</button>
+        </div>
+
+        <!-- View: Focus -->
+        <div id="view-focus" class="view">
+            <header>
+                <h1>Focus Mode</h1>
+            </header>
+            <div class="timer-container">
+                <div class="timer-circle">
+                    <svg viewBox="0 0 100 100">
+                        <circle class="bg-ring" cx="50" cy="50" r="45"></circle>
+                        <circle class="progress-ring" cx="50" cy="50" r="45"></circle>
+                    </svg>
+                    <div id="timer-display">25:00</div>
+                </div>
+
+                <div class="timer-controls">
+                    <label>Duration: <span id="duration-value">25</span> min</label>
+                    <input type="range" id="duration-slider" min="1" max="120" value="25">
+                </div>
+
+                <button id="timer-toggle" class="primary-btn">Start Focus</button>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav id="bottom-nav">
+            <button class="nav-item active" data-target="view-tasks">
+                <span class="icon">📝</span>
+                <span class="label">Tasks</span>
+            </button>
+            <button class="nav-item" data-target="view-calendar">
+                <span class="icon">📅</span>
+                <span class="label">Calendar</span>
+            </button>
+            <button class="nav-item" data-target="view-focus">
+                <span class="icon">🎯</span>
+                <span class="label">Focus</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Modals (Hidden by default) -->
+    <div id="task-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Add Task</h2>
+            <input type="text" id="task-input" placeholder="What needs to be done?">
+            <div class="modal-actions">
+                <button id="cancel-task-btn">Cancel</button>
+                <button id="save-task-btn" class="primary-btn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full Screen Event Modal -->
+    <div id="event-modal" class="modal hidden full-screen">
+        <div class="modal-content full-screen-content">
+            <div class="modal-header">
+                <button id="cancel-event-btn">Cancel</button>
+                <h2 id="event-modal-title">New Event</h2>
+                <button id="save-event-btn" class="primary-btn">Add</button>
+            </div>
+            <div id="day-timeline">
+                <!-- 00:00 to 23:00 Slots -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Input Modal (Nested for simplicity) -->
+    <div id="event-input-modal" class="modal hidden" style="z-index: 200;">
+        <div class="modal-content">
+            <h2>Event Details</h2>
+            <input type="text" id="event-title-input" placeholder="Event Title">
+            <div class="time-inputs">
+                <input type="time" id="event-start-time">
+                <span>to</span>
+                <input type="time" id="event-end-time">
+            </div>
+            <div class="modal-actions">
+                <button id="cancel-event-input-btn">Back</button>
+                <button id="confirm-event-btn" class="primary-btn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Logic -->
+    <script src="app.js"></script>
+</body>
+
+</html>
+<span class="label">Focus</span>
+</button>
+</nav>
+</div>
+
+< !--Modals -->
+    <div id="task-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>New Task</h2>
+            <input type="text" id="new-task-input" placeholder="What needs to be done?">
+            <div class="modal-actions">
+                <button id="cancel-task-btn">Cancel</button>
+                <button id="save-task-btn" class="primary-btn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!--Day View Modal(Full Screen)-- >
+    <div id="day-view-modal" class="modal full-screen hidden">
+        <div class="modal-content full-screen-content">
+            <header class="modal-header">
+                <button id="close-day-view-btn" class="icon-btn">←</button>
+                <h2 id="day-view-date">Date</h2>
+                <button id="add-event-btn" class="icon-btn">+</button>
+            </header>
+            <div id="day-timeline">
+                <!-- Hours injected by JS -->
+    </div>
+    </div>
+    </div>
+
+    <div id="event-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>New Event</h2>
+            <input type="text" id="new-event-title" placeholder="Event Title (e.g. Lunch)">
+            <input type="date" id="new-event-date"
+                style="width: 100%; padding: 12px; margin-bottom: 20px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; outline: none;">
+            <div class="time-inputs">
+                <input type="time" id="new-event-start" step="300">
+                <span>to</span>
+                <input type="time" id="new-event-end" step="300">
+            </div>
+            <div class="modal-actions">
+                <button id="cancel-event-btn">Cancel</button>
+                <button id="save-event-btn" class="primary-btn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    </body>
+
+    </html>

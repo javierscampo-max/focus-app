@@ -1,7 +1,8 @@
-const CACHE_NAME = 'productivity-pwa-v17'; // v17: Force Cache Update
+const CACHE_NAME = 'productivity-pwa-v18'; // v18: Plan B Magic Link
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
+    './app.html',
     './app.js',
     './manifest.json',
     './icon-v2.png',
