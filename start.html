@@ -725,8 +725,8 @@
         // Register Service Worker for Offline Support
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // v20: Final "Start" Entry Point
-                navigator.serviceWorker.register('service-worker.js?v=20')
+                // v21: Synthetic Fallback
+                navigator.serviceWorker.register('service-worker.js?v=21')
                     .then(registration => {
                         console.log('ServiceWorker registration successful with scope: ', registration.scope);
                     })
@@ -745,7 +745,7 @@
         <div id="view-tasks" class="view active">
             <header class="task-header">
                 <div>
-                    <h1>My Tasks (v20 Final)</h1>
+                    <h1>My Tasks (v21 Final)</h1>
                     <p class="subtitle">Let's get things done.</p>
                 </div>
                 <div id="task-count">0 left</div>

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'productivity-pwa-v20'; // v20: Start.html Bypass
+const CACHE_NAME = 'productivity-pwa-v21'; // v21: Synthetic Fallback
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -64,7 +64,12 @@ self.addEventListener('fetch', (event) => {
                     console.log('Fetch failed:', error);
                     // Offline Fallback for Navigation
                     if (event.request.mode === 'navigate') {
-                        return caches.match('./start.html');
+                        return caches.match('./start.html').then(response => {
+                            return response || new Response('<h1>Offline</h1><p>App not fully cached. Refresh online.</p>', {
+                                status: 200,
+                                headers: { 'Content-Type': 'text/html' }
+                            });
+                        });
                     }
                     // AGGRESSIVE FALLBACK: Return empty 200 OK for everything else (images, icons, etc)
                     // This creates a "ghost" file instead of an error, silencing the OS popup.
