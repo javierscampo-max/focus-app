@@ -1,4 +1,4 @@
-const CACHE_NAME = 'productivity-pwa-v21'; // v21: Synthetic Fallback
+const CACHE_NAME = 'productivity-pwa-v22'; // v22: No Manifest Diagnostic
 const ASSETS_TO_CACHE = [
     './',
     './index.html',

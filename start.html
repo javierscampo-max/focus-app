@@ -701,7 +701,7 @@
             padding: 2px;
         }
     </style>
-    <link rel="manifest" href="manifest.json">
+    <!-- <link rel="manifest" href="manifest.json"> -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
@@ -725,8 +725,8 @@
         // Register Service Worker for Offline Support
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // v21: Synthetic Fallback
-                navigator.serviceWorker.register('service-worker.js?v=21')
+                // v22: No Manifest Diagnostic
+                navigator.serviceWorker.register('service-worker.js?v=22')
                     .then(registration => {
                         console.log('ServiceWorker registration successful with scope: ', registration.scope);
                     })
@@ -745,7 +745,7 @@
         <div id="view-tasks" class="view active">
             <header class="task-header">
                 <div>
-                    <h1>My Tasks (v21 Final)</h1>
+                    <h1>My Tasks (v22 No PWA)</h1>
                     <p class="subtitle">Let's get things done.</p>
                 </div>
                 <div id="task-count">0 left</div>
