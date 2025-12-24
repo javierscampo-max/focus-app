@@ -1,8 +1,9 @@
-const CACHE_NAME = 'productivity-pwa-v19'; // v19: app.html Primary Fallback
+const CACHE_NAME = 'productivity-pwa-v20'; // v20: Start.html Bypass
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
     './app.html',
+    './start.html',
     './app.js',
     './manifest.json',
     './icon-v2.png',
@@ -63,7 +64,7 @@ self.addEventListener('fetch', (event) => {
                     console.log('Fetch failed:', error);
                     // Offline Fallback for Navigation
                     if (event.request.mode === 'navigate') {
-                        return caches.match('./app.html');
+                        return caches.match('./start.html');
                     }
                     // AGGRESSIVE FALLBACK: Return empty 200 OK for everything else (images, icons, etc)
                     // This creates a "ghost" file instead of an error, silencing the OS popup.
