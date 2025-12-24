@@ -1,4 +1,4 @@
-const CACHE_NAME = 'productivity-pwa-v22'; // v22: No Manifest Diagnostic
+const CACHE_NAME = 'productivity-pwa-v23'; // v23: Claim Clients Fix
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -31,20 +31,22 @@ self.addEventListener('install', (event) => {
     );
 });
 
-// Activate Event: Clean up old caches
+// Activate Event: Clean up old caches & Claim Clients immediately
 self.addEventListener('activate', (event) => {
     event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames.map((cache) => {
-                    if (cache !== CACHE_NAME) {
-                        return caches.delete(cache);
-                    }
-                })
-            );
-        })
+        Promise.all([
+            clients.claim(), // Fix: Immediately control the page (silence offline popup)
+            caches.keys().then((cacheNames) => {
+                return Promise.all(
+                    cacheNames.map((cache) => {
+                        if (cache !== CACHE_NAME) {
+                            return caches.delete(cache);
+                        }
+                    })
+                );
+            })
+        ])
     );
-    self.clients.claim();
 });
 
 // Fetch Event: Serve from Cache -> Network -> Offline Fallback
